@@ -1,3 +1,5 @@
+[![CI](https://github.com/MrTalal-AI/MTMbot/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MrTalal-AI/MTMbot/actions/workflows/ci.yml)
+
 # MTMbot — بوت تداول Multi-Timeframe Momentum
 
 بوت تداول مكتوب بلغة Python بمعمارية واحدة تُستخدم في **الباك-تست** و**التداول الورقي** و**التداول الحقيقي**.
