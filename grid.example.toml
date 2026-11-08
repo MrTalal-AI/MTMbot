@@ -1,0 +1,12 @@
+# Parameter grid for walk-forward validation:
+#   python -m mtmbot walkforward --data data/BTC-USD_1h.csv --grid grid.example.toml
+#
+# Every key must be a real strategy parameter; unknown keys are rejected and
+# invalid combinations (e.g. fast_ema >= slow_ema) are skipped automatically.
+# Keep the grid small: every extra combination is another way to fit noise.
+
+[grid]
+fast_ema = [13, 21]
+slow_ema = [55, 89]
+atr_stop_mult = [1.5, 2.5]
+reward_risk = [2.0, 3.0]

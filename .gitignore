@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# Bot artifacts
+data/
+reports/
+state/
+*.log
+.env
+.env.local
+
+# OS
+.DS_Store
