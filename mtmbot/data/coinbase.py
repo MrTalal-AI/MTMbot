@@ -7,7 +7,7 @@ it the default source for backtests.
 from __future__ import annotations
 
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from mtmbot.data.base import DataError, sanitize
@@ -47,7 +47,7 @@ def _row_to_candle(row: list[Any], product: str) -> Candle:
     if not isinstance(row, list) or len(row) < 6:
         raise DataError(f"coinbase row is malformed for {product}: {row!r}")
     return Candle(
-        ts=datetime.fromtimestamp(int(row[0]), tz=timezone.utc),
+        ts=datetime.fromtimestamp(int(row[0]), tz=UTC),
         open=float(row[3]),
         high=float(row[2]),
         low=float(row[1]),
@@ -69,8 +69,8 @@ class CoinbaseSource:
         factor = step_seconds // granularity
         if start.tzinfo is None or end.tzinfo is None:
             raise DataError("start and end must be timezone-aware")
-        start = start.astimezone(timezone.utc)
-        end = end.astimezone(timezone.utc)
+        start = start.astimezone(UTC)
+        end = end.astimezone(UTC)
         if end <= start:
             raise DataError("end must be after start")
 
@@ -111,7 +111,7 @@ class CoinbaseSource:
         """Return up to ``limit`` recent closed candles, oldest first."""
         if limit < 1:
             raise DataError(f"limit must be >= 1, got {limit!r}")
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         span = timedelta(seconds=step_seconds * min(limit + 30, _MAX_BARS_PER_REQUEST))
         candles = self.fetch_range(symbol, step_seconds, now - span, now)
         return candles[-limit:]
@@ -131,5 +131,4 @@ def download_history(
             f"history download supports source 'coinbase' only, got {source!r} "
             "(kraken only serves the latest 720 bars)"
         )
-    candles = CoinbaseSource().fetch_range(symbol, step_seconds, start, end)
-    return candles
+    return CoinbaseSource().fetch_range(symbol, step_seconds, start, end)

@@ -7,7 +7,7 @@ Coinbase source or ``mtmbot download`` for that.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from mtmbot.data.base import DataError, sanitize
@@ -75,7 +75,7 @@ class KrakenSource:
                 raise DataError(f"kraken row is malformed for {symbol}: {row!r}")
             candles.append(
                 Candle(
-                    ts=datetime.fromtimestamp(int(row[0]), tz=timezone.utc),
+                    ts=datetime.fromtimestamp(int(row[0]), tz=UTC),
                     open=float(row[1]),
                     high=float(row[2]),
                     low=float(row[3]),

@@ -7,7 +7,7 @@ The strategy is only allowed to read a higher-timeframe bar once that bar has
 from __future__ import annotations
 
 from collections.abc import Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from mtmbot.models import Candle
 
@@ -40,7 +40,7 @@ def resample(candles: Sequence[Candle], source_step: int, factor: int) -> list[C
         group = buckets[bucket]
         out.append(
             Candle(
-                ts=datetime.fromtimestamp(bucket, tz=timezone.utc),
+                ts=datetime.fromtimestamp(bucket, tz=UTC),
                 open=group[0].open,
                 high=max(candle.high for candle in group),
                 low=min(candle.low for candle in group),

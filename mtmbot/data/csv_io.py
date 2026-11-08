@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from mtmbot.data.base import DataError
@@ -24,17 +24,15 @@ def write_candles(path: str | Path, candles: list[Candle]) -> Path:
         raise DataError("refusing to write an empty candle series")
 
     ordered = sorted(candles, key=lambda c: c.ts)
-    handle = tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", newline="", dir=target.parent, delete=False, suffix=".tmp"
-    )
+    handle, tmp_name = tempfile.mkstemp(dir=target.parent, prefix=".candles-", suffix=".tmp")
     try:
-        with handle as stream:
+        with os.fdopen(handle, "w", encoding="utf-8", newline="") as stream:
             writer = csv.writer(stream)
             writer.writerow(HEADER)
             for candle in ordered:
                 writer.writerow(
                     [
-                        candle.ts.astimezone(timezone.utc).isoformat(),
+                        candle.ts.astimezone(UTC).isoformat(),
                         f"{candle.open:.10g}",
                         f"{candle.high:.10g}",
                         f"{candle.low:.10g}",
@@ -42,9 +40,9 @@ def write_candles(path: str | Path, candles: list[Candle]) -> Path:
                         f"{candle.volume:.10g}",
                     ]
                 )
-        os.replace(handle.name, target)
+        Path(tmp_name).replace(target)
     except BaseException:
-        Path(handle.name).unlink(missing_ok=True)
+        Path(tmp_name).unlink(missing_ok=True)
         raise
     return target
 
@@ -56,8 +54,8 @@ def _parse_ts(value: str, line: int) -> datetime:
     except ValueError as exc:
         raise DataError(f"line {line}: invalid timestamp {value!r}") from exc
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 def _parse_float(row: dict[str, str], key: str, line: int) -> float:

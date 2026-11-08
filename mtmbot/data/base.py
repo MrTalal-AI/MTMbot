@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Protocol, runtime_checkable
 
 from mtmbot.models import Candle
@@ -48,19 +48,18 @@ def sanitize(candles: list[Candle], step_seconds: int, now: datetime | None = No
     """
     if step_seconds <= 0:
         raise DataError(f"step_seconds must be positive, got {step_seconds!r}")
-    current = now or datetime.now(timezone.utc)
+    current = now or datetime.now(UTC)
     if current.tzinfo is None:
         raise DataError("now must be timezone-aware")
-    current = current.astimezone(timezone.utc)
+    current = current.astimezone(UTC)
 
     by_ts: dict[datetime, Candle] = {}
     for candle in candles:
         by_ts[candle.ts] = candle
 
     ordered = [by_ts[key] for key in sorted(by_ts)]
-    closed = [
+    return [
         candle
         for candle in ordered
         if candle.ts.timestamp() + step_seconds <= current.timestamp() + 1e-6
     ]
-    return closed
