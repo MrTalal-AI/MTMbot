@@ -10,10 +10,10 @@ venv/
 build/
 dist/
 
-# Bot artifacts
-data/
-reports/
-state/
+# Bot artifacts (root only: 'data/' would also ignore the mtmbot/data package)
+/data/
+/reports/
+/state/
 *.log
 .env
 .env.local
